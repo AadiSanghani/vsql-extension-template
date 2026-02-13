@@ -23,6 +23,8 @@ void soundex_impl(vef_context_t* ctx, vef_invalue_t* input,
                   vef_vdf_result_t* result);
 void levenshtein_impl(vef_context_t* ctx, vef_invalue_t* source,
                       vef_invalue_t* target, vef_vdf_result_t* result);
+void metaphone_impl(vef_context_t* ctx, vef_invalue_t* input,
+                    vef_invalue_t* max_phonemes, vef_vdf_result_t* result);
 
 VEF_GENERATE_ENTRY_POINTS(
   make_extension("fuzzystrmatch", "1.0.0")
@@ -35,5 +37,11 @@ VEF_GENERATE_ENTRY_POINTS(
       .returns(INT)
       .param(STRING)
       .param(STRING)
+      .build())
+    .func(make_func<&metaphone_impl>("metaphone")
+      .returns(STRING)
+      .param(STRING)
+      .param(INT)
+      .buffer_size(64)
       .build())
 )

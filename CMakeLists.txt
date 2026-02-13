@@ -34,6 +34,7 @@ add_library(fuzzystrmatch SHARED
     src/extension.cc
     src/soundex.cc
     src/levenshtein.cc
+    src/metaphone.cc
 )
 
 # Include directories
