@@ -14,16 +14,34 @@
  * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <villagesql/extension.h>
+
 #include <algorithm>
-#include <string>
 #include <vector>
 
-int64_t levenshtein_impl(const std::string& source, const std::string& target) {
-  const size_t m = source.size();
-  const size_t n = target.size();
+void levenshtein_impl(vef_context_t* ctx, vef_invalue_t* source,
+                      vef_invalue_t* target, vef_vdf_result_t* result) {
+  if (source->is_null || target->is_null) {
+    result->type = VEF_RESULT_NULL;
+    return;
+  }
 
-  if (m == 0) return static_cast<int>(n);
-  if (n == 0) return static_cast<int>(m);
+  const size_t m = source->str_len;
+  const size_t n = target->str_len;
+
+  if (m == 0) {
+    result->int_value = static_cast<int64_t>(n);
+    result->type = VEF_RESULT_VALUE;
+    return;
+  }
+  if (n == 0) {
+    result->int_value = static_cast<int64_t>(m);
+    result->type = VEF_RESULT_VALUE;
+    return;
+  }
+
+  const char* src = source->str_value;
+  const char* tgt = target->str_value;
 
   // Use two rows instead of full matrix for O(min(m,n)) space
   std::vector<int> prev(n + 1);
@@ -37,14 +55,15 @@ int64_t levenshtein_impl(const std::string& source, const std::string& target) {
     curr[0] = static_cast<int>(i);
 
     for (size_t j = 1; j <= n; ++j) {
-      int cost = (source[i - 1] == target[j - 1]) ? 0 : 1;
-      curr[j] = std::min({prev[j] + 1,        
-                          curr[j - 1] + 1,     
-                          prev[j - 1] + cost}); 
+      int cost = (src[i - 1] == tgt[j - 1]) ? 0 : 1;
+      curr[j] = std::min({prev[j] + 1,
+                          curr[j - 1] + 1,
+                          prev[j - 1] + cost});
     }
 
     std::swap(prev, curr);
   }
 
-  return prev[n];
+  result->int_value = static_cast<int64_t>(prev[n]);
+  result->type = VEF_RESULT_VALUE;
 }
