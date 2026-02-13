@@ -15,25 +15,24 @@
  */
 
 #include <villagesql/extension.h>
+#include <villagesql/func_builder.h>
 
-#include <cstring>
+std::string soundex_impl(const std::string& input);
+int64_t levenshtein_impl(const std::string& source, const std::string& target);
 
 using namespace villagesql::extension_builder;
 using namespace villagesql::func_builder;
 
-// Hello world function implementation
-void hello_world_impl(vef_context_t* ctx, vef_vdf_result_t* result) {
-  const char* hello = "Hello, World!";
-  strcpy(result->str_buf, hello);
-  result->type = VEF_RESULT_VALUE;
-  result->actual_len = strlen(hello);
-}
-
-// Extension registration
 VEF_GENERATE_ENTRY_POINTS(
-  make_extension("vsql_extension_template", "1.0.0")
-    .func(make_func<&hello_world_impl>("hello_world")
+  make_extension("fuzzystrmatch", "1.0.0")
+    .func(make_func("soundex")
       .returns(STRING)
-      .buffer_size(14)  // "Hello, World!" + null terminator
-      .build())
-)
+      .param(STRING)
+      .wrap<&soundex_impl>())
+    .func(make_func("levenshtein")
+      .returns(INT)
+      .param(STRING)
+      .param(STRING)
+      .wrap<&levenshtein_impl>())
+    .build()
+);

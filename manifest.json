@@ -1,7 +1,7 @@
 {
-  "name": "vsql_extension_template",
+  "name": "fuzzystrmatch",
   "version": "1.0.0",
-  "description": "Template project for creating VillageSQL extensions",
-  "author": "Your Name",
+  "description": "Fuzzy string matching functions for VillageSQL",
+  "author": "Aadi Sanghani",
   "license": "GPL-2.0"
 }
